@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('regions', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('code');
+            $table->float('lat', 8, 6)->nullable();
+            $table->float('lon', 9, 6)->nullable();
             $table->timestamps();
         });
     }

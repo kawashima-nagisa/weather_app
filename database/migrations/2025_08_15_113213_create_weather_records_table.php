@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('weather_records', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('region_id')->constrained('regions');
+            $table->string('weather');
+            $table->float('temperature', 5, 2);
+            $table->date('date');
             $table->timestamps();
+            
+            $table->unique(['region_id', 'date']);
         });
     }
 

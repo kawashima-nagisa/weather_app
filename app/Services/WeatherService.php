@@ -22,7 +22,7 @@ class WeatherService
     /**
      * 指定地域の天気情報を取得（キャッシュ機能付き）
      */
-    public function getWeatherForRegion(int $regionId): ?WeatherRecord
+    public function getWeatherForRegion(int $regionId): ?array
     {
         $region = Region::find($regionId);
         if (!$region) {
@@ -38,7 +38,11 @@ class WeatherService
 
         if ($existingRecord) {
             Log::info("天気データをDBから取得", ['region' => $region->name, 'date' => $today]);
-            return $existingRecord;
+            return [
+                'record' => $existingRecord,
+                'is_from_cache' => true,
+                'cached_at' => $existingRecord->created_at,
+            ];
         }
 
         // APIから取得
@@ -56,7 +60,11 @@ class WeatherService
         ]);
 
         Log::info("天気データをAPIから取得しDBに保存", ['region' => $region->name, 'date' => $today]);
-        return $weatherRecord;
+        return [
+            'record' => $weatherRecord,
+            'is_from_cache' => false,
+            'fetched_at' => now(),
+        ];
     }
 
     /**

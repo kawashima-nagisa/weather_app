@@ -33,12 +33,12 @@ class WeatherController extends Controller
         ]);
 
         $regions = $this->weatherService->getAllRegions();
-        $weatherRecord = $this->weatherService->getWeatherForRegion($request->region_id);
+        $weatherData = $this->weatherService->getWeatherForRegion($request->region_id);
         
-        if (!$weatherRecord) {
+        if (!$weatherData) {
             return back()->withErrors(['error' => '天気情報の取得に失敗しました。']);
         }
 
-        return view('weather.index', compact('regions', 'weatherRecord'));
+        return view('weather.index', compact('regions', 'weatherData'));
     }
 }

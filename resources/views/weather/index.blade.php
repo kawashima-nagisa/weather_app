@@ -15,7 +15,7 @@
                 <option value="">地域を選択...</option>
                 @foreach($regions as $region)
                     <option value="{{ $region->id }}" 
-                        {{ isset($weatherRecord) && $weatherRecord->region_id == $region->id ? 'selected' : '' }}>
+                        {{ isset($weatherData) && $weatherData['record']->region_id == $region->id ? 'selected' : '' }}>
                         {{ $region->name }}
                     </option>
                 @endforeach
@@ -27,37 +27,37 @@
         </button>
     </form>
 
-    @isset($weatherRecord)
+    @isset($weatherData)
     <div class="border-t pt-6">
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
             <div class="text-center">
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">
-                    📍 {{ $weatherRecord->region->name }}
+                    📍 {{ $weatherData['record']->region->name }}
                 </h2>
                 <div class="text-sm text-gray-600 mb-4">
-                    {{ $weatherRecord->date->format('Y年m月d日') }}の天気
+                    {{ $weatherData['record']->date->format('Y年m月d日') }}の天気
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
                     <div class="bg-white rounded-lg p-4 shadow-sm">
                         <div class="text-2xl mb-1">🌤️</div>
                         <div class="text-lg font-semibold text-gray-800">
-                            {{ $weatherRecord->weather }}
+                            {{ $weatherData['record']->weather }}
                         </div>
                     </div>
                     <div class="bg-white rounded-lg p-4 shadow-sm">
                         <div class="text-2xl mb-1">🌡️</div>
                         <div class="text-2xl font-bold text-blue-600">
-                            {{ $weatherRecord->temperature }}°C
+                            {{ $weatherData['record']->temperature }}°C
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4 text-xs text-gray-500">
-                    @if($weatherRecord->created_at->isToday())
-                        APIから取得 ({{ $weatherRecord->created_at->setTimezone('Asia/Tokyo')->format('H:i') }})
+                    @if($weatherData['is_from_cache'])
+                        キャッシュから取得 ({{ $weatherData['cached_at']->setTimezone('Asia/Tokyo')->format('H:i') }}に取得済み)
                     @else
-                        データベースから取得
+                        APIから取得 ({{ $weatherData['fetched_at']->format('H:i') }})
                     @endif
                 </div>
             </div>
@@ -66,7 +66,7 @@
     @endisset
 </div>
 
-@isset($weatherRecord)
+@isset($weatherData)
 <div class="mt-6 text-center">
     <a href="{{ route('weather.index') }}" 
         class="inline-block bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">

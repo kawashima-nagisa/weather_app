@@ -55,7 +55,7 @@
 
                 <div class="mt-4 text-xs text-gray-500">
                     @if($weatherRecord->created_at->isToday())
-                        APIから取得 ({{ $weatherRecord->created_at->format('H:i') }})
+                        APIから取得 ({{ $weatherRecord->created_at->setTimezone('Asia/Tokyo')->format('H:i') }})
                     @else
                         データベースから取得
                     @endif

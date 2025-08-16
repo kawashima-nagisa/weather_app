@@ -55,7 +55,21 @@ class WeatherService
         $weatherRecord = WeatherRecord::create([
             'region_id' => $regionId,
             'weather' => $weatherData['weather'],
+            'icon' => $weatherData['icon'],
             'temperature' => $weatherData['temperature'],
+            'feels_like' => $weatherData['feels_like'],
+            'temp_min' => $weatherData['temp_min'],
+            'temp_max' => $weatherData['temp_max'],
+            'pressure' => $weatherData['pressure'],
+            'humidity' => $weatherData['humidity'],
+            'visibility' => $weatherData['visibility'],
+            'wind_speed' => $weatherData['wind_speed'],
+            'wind_deg' => $weatherData['wind_deg'],
+            'clouds' => $weatherData['clouds'],
+            'sunrise' => $weatherData['sunrise'],
+            'sunset' => $weatherData['sunset'],
+            'country' => $weatherData['country'],
+            'api_dt' => $weatherData['api_dt'],
             'date' => $today,
         ]);
 
@@ -93,7 +107,21 @@ class WeatherService
 
             return [
                 'weather' => $data['weather'][0]['description'] ?? '不明',
+                'icon' => $data['weather'][0]['icon'] ?? null,
                 'temperature' => round($data['main']['temp'], 1),
+                'feels_like' => round($data['main']['feels_like'], 1),
+                'temp_min' => round($data['main']['temp_min'], 1),
+                'temp_max' => round($data['main']['temp_max'], 1),
+                'pressure' => $data['main']['pressure'] ?? null,
+                'humidity' => $data['main']['humidity'] ?? null,
+                'visibility' => $data['visibility'] ?? null,
+                'wind_speed' => $data['wind']['speed'] ?? null,
+                'wind_deg' => $data['wind']['deg'] ?? null,
+                'clouds' => $data['clouds']['all'] ?? null,
+                'sunrise' => isset($data['sys']['sunrise']) ? $data['sys']['sunrise'] : null,
+                'sunset' => isset($data['sys']['sunset']) ? $data['sys']['sunset'] : null,
+                'country' => $data['sys']['country'] ?? null,
+                'api_dt' => $data['dt'] ?? null,
             ];
         } catch (\Exception $e) {
             Log::error("天気API取得エラー", [

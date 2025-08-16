@@ -16,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WeatherController::class, 'index'])->name('weather.index');
 Route::post('/weather', [WeatherController::class, 'show'])->name('weather.show');
+Route::post('/weather/current-location', [WeatherController::class, 'currentLocation'])->name('weather.current-location');

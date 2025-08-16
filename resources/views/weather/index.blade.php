@@ -38,9 +38,17 @@
                     {{ $weatherData['record']->date->format('Y年m月d日') }}の天気
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                <!-- メイン天気情報 -->
+                <div class="grid grid-cols-2 gap-4 max-w-md mx-auto mb-6">
                     <div class="bg-white rounded-lg p-4 shadow-sm">
-                        <div class="text-2xl mb-1">🌤️</div>
+                        <div class="text-2xl mb-1">
+                            @if($weatherData['record']->icon)
+                                <img src="https://openweathermap.org/img/wn/{{ $weatherData['record']->icon }}@2x.png" 
+                                     alt="{{ $weatherData['record']->weather }}" class="w-12 h-12 mx-auto">
+                            @else
+                                🌤️
+                            @endif
+                        </div>
                         <div class="text-lg font-semibold text-gray-800">
                             {{ $weatherData['record']->weather }}
                         </div>
@@ -50,7 +58,76 @@
                         <div class="text-2xl font-bold text-blue-600">
                             {{ $weatherData['record']->temperature }}°C
                         </div>
+                        @if($weatherData['record']->feels_like)
+                            <div class="text-sm text-gray-600">
+                                体感 {{ $weatherData['record']->feels_like }}°C
+                            </div>
+                        @endif
                     </div>
+                </div>
+
+                <!-- 詳細天気情報 -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto mb-6">
+                    @if($weatherData['record']->temp_min && $weatherData['record']->temp_max)
+                    <div class="bg-white rounded-lg p-3 shadow-sm">
+                        <div class="text-lg mb-1">📊</div>
+                        <div class="text-sm font-semibold text-gray-800">最高/最低</div>
+                        <div class="text-lg font-bold text-red-500">{{ $weatherData['record']->temp_max }}°C</div>
+                        <div class="text-lg font-bold text-blue-500">{{ $weatherData['record']->temp_min }}°C</div>
+                    </div>
+                    @endif
+
+                    @if($weatherData['record']->humidity)
+                    <div class="bg-white rounded-lg p-3 shadow-sm">
+                        <div class="text-lg mb-1">💧</div>
+                        <div class="text-sm font-semibold text-gray-800">湿度</div>
+                        <div class="text-lg font-bold text-blue-600">{{ $weatherData['record']->humidity }}%</div>
+                    </div>
+                    @endif
+
+                    @if($weatherData['record']->pressure)
+                    <div class="bg-white rounded-lg p-3 shadow-sm">
+                        <div class="text-lg mb-1">⏲️</div>
+                        <div class="text-sm font-semibold text-gray-800">気圧</div>
+                        <div class="text-lg font-bold text-purple-600">{{ $weatherData['record']->pressure }}hPa</div>
+                    </div>
+                    @endif
+
+                    @if($weatherData['record']->wind_speed)
+                    <div class="bg-white rounded-lg p-3 shadow-sm">
+                        <div class="text-lg mb-1">💨</div>
+                        <div class="text-sm font-semibold text-gray-800">風速</div>
+                        <div class="text-lg font-bold text-green-600">{{ $weatherData['record']->wind_speed }}m/s</div>
+                        @if($weatherData['record']->wind_deg)
+                            <div class="text-xs text-gray-500">{{ $weatherData['record']->wind_deg }}°</div>
+                        @endif
+                    </div>
+                    @endif
+
+                    @if($weatherData['record']->visibility)
+                    <div class="bg-white rounded-lg p-3 shadow-sm">
+                        <div class="text-lg mb-1">👁️</div>
+                        <div class="text-sm font-semibold text-gray-800">視界</div>
+                        <div class="text-lg font-bold text-indigo-600">{{ round($weatherData['record']->visibility / 1000, 1) }}km</div>
+                    </div>
+                    @endif
+
+                    @if($weatherData['record']->clouds)
+                    <div class="bg-white rounded-lg p-3 shadow-sm">
+                        <div class="text-lg mb-1">☁️</div>
+                        <div class="text-sm font-semibold text-gray-800">雲量</div>
+                        <div class="text-lg font-bold text-gray-600">{{ $weatherData['record']->clouds }}%</div>
+                    </div>
+                    @endif
+
+                    @if($weatherData['record']->sunrise && $weatherData['record']->sunset)
+                    <div class="bg-white rounded-lg p-3 shadow-sm">
+                        <div class="text-lg mb-1">🌅</div>
+                        <div class="text-sm font-semibold text-gray-800">日の出/日の入り</div>
+                        <div class="text-sm font-bold text-orange-500">{{ \Carbon\Carbon::createFromTimestamp($weatherData['record']->sunrise)->setTimezone('Asia/Tokyo')->format('H:i') }}</div>
+                        <div class="text-sm font-bold text-purple-500">{{ \Carbon\Carbon::createFromTimestamp($weatherData['record']->sunset)->setTimezone('Asia/Tokyo')->format('H:i') }}</div>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="mt-4 text-xs text-gray-500">

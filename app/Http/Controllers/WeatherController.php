@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\WeatherService;
+use App\UseCases\RegionWeatherUsecase;
+use App\UseCases\LocationWeatherUsecase;
 use Illuminate\Http\Request;
 
 class WeatherController extends Controller
 {
-    private WeatherService $weatherService;
+    private RegionWeatherUsecase $regionWeatherUsecase;
+    private LocationWeatherUsecase $locationWeatherUsecase;
 
-    public function __construct(WeatherService $weatherService)
-    {
-        $this->weatherService = $weatherService;
+    public function __construct(
+        RegionWeatherUsecase $regionWeatherUsecase,
+        LocationWeatherUsecase $locationWeatherUsecase
+    ) {
+        $this->regionWeatherUsecase = $regionWeatherUsecase;
+        $this->locationWeatherUsecase = $locationWeatherUsecase;
     }
 
     /**
@@ -19,7 +24,7 @@ class WeatherController extends Controller
      */
     public function index()
     {
-        $regions = $this->weatherService->getAllRegions();
+        $regions = $this->regionWeatherUsecase->getAllRegions();
         return view('weather.index', compact('regions'));
     }
 
@@ -32,8 +37,8 @@ class WeatherController extends Controller
             'region_id' => 'required|integer|exists:regions,id'
         ]);
 
-        $regions = $this->weatherService->getAllRegions();
-        $weatherData = $this->weatherService->getWeatherForRegion($request->region_id);
+        $regions = $this->regionWeatherUsecase->getAllRegions();
+        $weatherData = $this->regionWeatherUsecase->getWeatherForRegion($request->region_id);
         
         if (!$weatherData) {
             return back()->withErrors(['error' => '天気情報の取得に失敗しました。']);
@@ -52,7 +57,7 @@ class WeatherController extends Controller
             'lon' => 'required|numeric|between:-180,180'
         ]);
 
-        $locationWeatherData = $this->weatherService->getWeatherByLocation($request->lat, $request->lon);
+        $locationWeatherData = $this->locationWeatherUsecase->getWeatherByLocation($request->lat, $request->lon);
         
         if (!$locationWeatherData) {
             return response()->json(['error' => '天気情報の取得に失敗しました。'], 500);

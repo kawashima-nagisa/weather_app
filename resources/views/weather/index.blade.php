@@ -279,7 +279,7 @@ document.getElementById('currentLocationBtn').addEventListener('click', function
                         📍 ${record.location_name}
                     </h2>
                     <div class="text-sm text-gray-600 mb-4">
-                        ${record.date}の天気
+                        ${new Date(record.date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long', day: 'numeric'})}の天気
                     </div>
                     
                     <!-- メイン天気情報 -->

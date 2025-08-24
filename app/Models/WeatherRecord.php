@@ -12,6 +12,7 @@ class WeatherRecord extends Model
 
     protected $fillable = [
         'region_id',
+        'location_name',
         'weather',
         'icon',
         'temperature',
@@ -23,12 +24,12 @@ class WeatherRecord extends Model
         'visibility',
         'wind_speed',
         'wind_deg',
-        'clouds',
         'sunrise',
         'sunset',
         'country',
         'api_dt',
         'date',
+        'locale',
     ];
 
     protected $casts = [

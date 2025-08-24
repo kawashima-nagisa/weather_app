@@ -16,6 +16,7 @@ class WeatherLocation extends Model
         'location_name',
         'country',
         'weather_data',
+        'locale',
     ];
 
     protected $casts = [

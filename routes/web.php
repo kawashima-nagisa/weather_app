@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\WeatherController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,3 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [WeatherController::class, 'index'])->name('weather.index');
 Route::post('/weather', [WeatherController::class, 'show'])->name('weather.show');
 Route::post('/weather/current-location', [WeatherController::class, 'currentLocation'])->name('weather.current-location');
+
+// 言語切り替え
+Route::post('/language/switch', [LanguageController::class, 'switch'])->name('language.switch');

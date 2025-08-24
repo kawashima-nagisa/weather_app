@@ -21,7 +21,8 @@ return new class extends Migration
             $table->json('weather_data');
             $table->timestamps();
             
-            $table->unique(['lat_rounded', 'lon_rounded', 'date'], 'unique_location_date');
+            $table->string('locale', 2)->default('ja');
+            $table->unique(['lat_rounded', 'lon_rounded', 'date', 'locale'], 'unique_location_date_locale');
         });
     }
 

@@ -19,7 +19,8 @@ return new class extends Migration
             $table->date('date');
             $table->timestamps();
             
-            $table->unique(['region_id', 'date']);
+            $table->string('locale', 2)->default('ja');
+            $table->unique(['region_id', 'date', 'locale']);
         });
     }
 

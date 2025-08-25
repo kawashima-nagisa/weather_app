@@ -205,6 +205,51 @@
                     @endif
                 </div>
 
+                <!-- 時間別予報セクション -->
+                @if(isset($weatherData['hourly_forecast']) && count($weatherData['hourly_forecast']) > 0)
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">
+                        ⏰ {{ __('app.hourly_forecast') }}
+                    </h3>
+                    
+                    <!-- 横スクロール可能なカード -->
+                    <div class="overflow-x-auto scrollbar-hide">
+                        <div class="flex space-x-3 pb-2" style="width: max-content;">
+                            @foreach($weatherData['hourly_forecast'] as $hourly)
+                            <div class="bg-white rounded-lg p-3 shadow-sm flex-shrink-0 w-24 text-center">
+                                <!-- 時刻 -->
+                                <div class="text-xs text-gray-600 mb-1">
+                                    {{ \Carbon\Carbon::createFromTimestamp($hourly['forecast_time'])->setTimezone('Asia/Tokyo')->format('H:i') }}
+                                </div>
+                                
+                                <!-- 天気アイコン -->
+                                <div class="mb-1">
+                                    @if(isset($hourly['icon']) && $hourly['icon'])
+                                        <img src="https://openweathermap.org/img/wn/{{ $hourly['icon'] }}.png" 
+                                             alt="{{ $hourly['weather'] ?? '天気' }}" class="w-8 h-8 mx-auto">
+                                    @else
+                                        <div class="text-lg">🌤️</div>
+                                    @endif
+                                </div>
+                                
+                                <!-- 気温 -->
+                                <div class="text-sm font-bold text-blue-600 mb-1">
+                                    {{ round($hourly['temperature'], 1) }}°
+                                </div>
+                                
+                                <!-- 降水確率 -->
+                                @if(isset($hourly['pop']) && $hourly['pop'] > 0)
+                                <div class="text-xs text-blue-500">
+                                    💧{{ round($hourly['pop'] * 100) }}%
+                                </div>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <div class="mt-4 text-xs text-gray-500">
                     @if($weatherData['is_from_cache'])
                         {{ __('app.from_cache') }} ({{ $weatherData['retrieved_at']->setTimezone('Asia/Tokyo')->format('H:i') }}{{ __('app.cached_at') }})

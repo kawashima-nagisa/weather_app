@@ -34,6 +34,12 @@ class WeatherController extends Controller
             return back()->withErrors(['error' => __('app.weather_fetch_error')]);
         }
 
+        // 時間別予報も取得
+        $hourlyForecasts = $this->weatherService->getRegionHourlyForecast($request->region_id);
+        if ($hourlyForecasts) {
+            $weatherData['hourly_forecast'] = $hourlyForecasts;
+        }
+
         return view('weather.index', compact('regions', 'weatherData'));
     }
 
@@ -50,6 +56,15 @@ class WeatherController extends Controller
         
         if (!$locationWeatherData) {
             return back()->withErrors(['error' => __('app.weather_fetch_error')]);
+        }
+
+        // 時間別予報も取得
+        $hourlyForecasts = $this->weatherService->getLocationHourlyForecast(
+            $request->lat,
+            $request->lon
+        );
+        if ($hourlyForecasts) {
+            $locationWeatherData['hourly_forecast'] = $hourlyForecasts;
         }
 
         return view('weather.index', [

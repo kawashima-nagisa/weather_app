@@ -91,4 +91,61 @@ class WeatherService
             'retrieved_at' => Carbon::now(),
         ];
     }
+
+    // 地域の時間別予報取得（キャッシュ優先 → API取得 → DB保存）
+    public function getRegionHourlyForecast(int $regionId): ?array
+    {
+        $locale = app()->getLocale();
+        
+        // キャッシュ確認：同一地域×同一言語の今後24時間分
+        $cachedForecasts = $this->dbService->findRegionHourlyCache($regionId, $locale);
+        
+        if ($cachedForecasts) {
+            // キャッシュヒット：DBから取得
+            return $cachedForecasts;
+        }
+
+        // キャッシュミス：APIから新規取得
+        $region = $this->dbService->getRegionById($regionId);
+        if (!$region) {
+            return null;
+        }
+
+        $forecastData = $this->apiService->fetchHourlyForecast($region->lat, $region->lon);
+        if (!$forecastData || !isset($forecastData['hourly'])) {
+            return null;
+        }
+
+        // DB保存してキャッシュ作成
+        $this->dbService->saveRegionHourlyForecasts($forecastData['hourly'], $regionId, $locale);
+
+        // 保存後の今後24時間分を再取得
+        return $this->dbService->findRegionHourlyCache($regionId, $locale);
+    }
+
+    // 現在地の時間別予報取得（座標範囲キャッシュ優先 → API取得 → DB保存）
+    public function getLocationHourlyForecast(float $lat, float $lon): ?array
+    {
+        $locale = app()->getLocale();
+        
+        // キャッシュ確認：座標範囲×同一言語の今後24時間分（0.1度単位丸め）
+        $cachedForecasts = $this->dbService->findLocationHourlyCache($lat, $lon, $locale);
+        
+        if ($cachedForecasts) {
+            // キャッシュヒット：DBから取得
+            return $cachedForecasts;
+        }
+
+        // キャッシュミス：APIから新規取得
+        $forecastData = $this->apiService->fetchHourlyForecast($lat, $lon);
+        if (!$forecastData || !isset($forecastData['hourly'])) {
+            return null;
+        }
+
+        // DB保存してキャッシュ作成
+        $this->dbService->saveLocationHourlyForecasts($forecastData['hourly'], $lat, $lon, $locale);
+
+        // 保存後の今後24時間分を再取得
+        return $this->dbService->findLocationHourlyCache($lat, $lon, $locale);
+    }
 }

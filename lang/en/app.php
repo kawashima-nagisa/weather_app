@@ -23,6 +23,7 @@ return [
     'visibility' => 'Visibility',
     'clouds' => 'Clouds',
     'sunrise_sunset' => 'Sunrise/Sunset',
+    'hourly_forecast' => 'Hourly Forecast',
     
     // Messages
     'loading' => 'Getting current location...',

@@ -23,6 +23,7 @@ return [
     'visibility' => '能见度',
     'clouds' => '云量',
     'sunrise_sunset' => '日出/日落',
+    'hourly_forecast' => '逐时预报',
     
     // 消息
     'loading' => '正在获取当前位置...',

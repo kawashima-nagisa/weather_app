@@ -23,6 +23,7 @@ return [
     'visibility' => '視界',
     'clouds' => '雲量',
     'sunrise_sunset' => '日の出/日の入り',
+    'hourly_forecast' => '時間別予報',
     
     // メッセージ
     'loading' => '現在地を取得中...',

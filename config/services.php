@@ -36,4 +36,9 @@ return [
         'base_url' => env('OPENWEATHER_BASE_URL', 'https://api.openweathermap.org/data/2.5'),
     ],
 
+    'hotpepper' => [
+        'api_key' => env('HOTPEPPER_API_KEY'),
+        'base_url' => env('HOTPEPPER_BASE_URL', 'http://webservice.recruit.co.jp/hotpepper'),
+    ],
+
 ];

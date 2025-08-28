@@ -52,4 +52,11 @@ return [
     'meta_description' => '查看日本各地区天气预报的天气应用。获取实时温度和天气状况。',
     'meta_keywords' => '天气预报, 气温, 日本, 天气应用, OpenWeatherMap',
     'powered_by' => 'Powered by OpenWeatherMap',
+    
+    // 美食推荐功能
+    'weather_based_restaurants' => '天气推荐美食',
+    'view_details' => '查看详情',
+    'gourmet_recommendations' => '美食推荐',
+    'no_restaurants_found' => '未找到推荐餐厅',
+    'restaurant_info_unavailable' => '无法获取餐厅信息',
 ];

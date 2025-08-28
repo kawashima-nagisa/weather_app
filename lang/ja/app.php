@@ -52,4 +52,11 @@ return [
     'meta_description' => '日本の地域別天気予報を確認できる天気アプリです。リアルタイムの気温と天気状況をお知らせします。',
     'meta_keywords' => '天気予報, 気温, 日本, 天気アプリ, OpenWeatherMap',
     'powered_by' => 'Powered by OpenWeatherMap',
+    
+    // グルメ推奨機能
+    'weather_based_restaurants' => '天気に合わせたおすすめグルメ',
+    'view_details' => '詳細を見る',
+    'gourmet_recommendations' => 'おすすめグルメ',
+    'no_restaurants_found' => 'おすすめレストランが見つかりませんでした',
+    'restaurant_info_unavailable' => 'レストラン情報を取得できませんでした',
 ];

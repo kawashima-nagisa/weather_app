@@ -52,4 +52,11 @@ return [
     'meta_description' => 'Weather app for checking regional weather forecasts in Japan. Get real-time temperature and weather conditions.',
     'meta_keywords' => 'weather forecast, temperature, Japan, weather app, OpenWeatherMap',
     'powered_by' => 'Powered by OpenWeatherMap',
+    
+    // Gourmet recommendation feature
+    'weather_based_restaurants' => 'Weather-Based Restaurant Recommendations',
+    'view_details' => 'View Details',
+    'gourmet_recommendations' => 'Restaurant Recommendations',
+    'no_restaurants_found' => 'No recommended restaurants found',
+    'restaurant_info_unavailable' => 'Restaurant information is not available',
 ];

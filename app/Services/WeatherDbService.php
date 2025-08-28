@@ -131,26 +131,35 @@ class WeatherDbService
     // 地域用の時間別予報をDBに一括保存
     public function saveRegionHourlyForecasts(array $hourlyData, int $regionId, string $locale): void
     {
-        // 既存データを削除（同一地域・同一言語の当日データ）
+        // 既存データを削除（同一地域・同一言語の全データ）
         WeatherHourlyForecast::where('region_id', $regionId)
             ->where('locale', $locale)
-            ->where('date', Carbon::today())
             ->delete();
 
-        // 48時間分のデータを保存
+        // 48時間分のデータを保存（重複チェック付き）
         foreach ($hourlyData as $hourly) {
-            WeatherHourlyForecast::create([
-                'region_id' => $regionId,
-                'lat_rounded' => null,
-                'lon_rounded' => null,
-                'forecast_time' => Carbon::createFromTimestamp($hourly['dt']),
-                'temperature' => $hourly['temp'],
-                'weather' => $hourly['weather'][0]['description'] ?? '不明',
-                'icon' => $hourly['weather'][0]['icon'] ?? null,
-                'pop' => $hourly['pop'] ?? 0, // 降水確率
-                'date' => Carbon::today(),
-                'locale' => $locale,
-            ]);
+            $forecastTime = Carbon::createFromTimestamp($hourly['dt']);
+            
+            // 重複チェック：同じ地域・言語・予報時刻のデータが存在しないことを確認
+            $exists = WeatherHourlyForecast::where('region_id', $regionId)
+                ->where('locale', $locale)
+                ->where('forecast_time', $forecastTime)
+                ->exists();
+            
+            if (!$exists) {
+                WeatherHourlyForecast::create([
+                    'region_id' => $regionId,
+                    'lat_rounded' => null,
+                    'lon_rounded' => null,
+                    'forecast_time' => $forecastTime,
+                    'temperature' => $hourly['temp'],
+                    'weather' => $hourly['weather'][0]['description'] ?? '不明',
+                    'icon' => $hourly['weather'][0]['icon'] ?? null,
+                    'pop' => $hourly['pop'] ?? 0, // 降水確率
+                    'date' => Carbon::today(),
+                    'locale' => $locale,
+                ]);
+            }
         }
     }
 
@@ -160,27 +169,37 @@ class WeatherDbService
         $latRounded = round($lat, 1);
         $lonRounded = round($lon, 1);
 
-        // 既存データを削除（同一座標・同一言語の当日データ）
+        // 既存データを削除（同一座標・同一言語の全データ）
         WeatherHourlyForecast::where('lat_rounded', $latRounded)
             ->where('lon_rounded', $lonRounded)
             ->where('locale', $locale)
-            ->where('date', Carbon::today())
             ->delete();
 
-        // 48時間分のデータを保存
+        // 48時間分のデータを保存（重複チェック付き）
         foreach ($hourlyData as $hourly) {
-            WeatherHourlyForecast::create([
-                'region_id' => null,
-                'lat_rounded' => $latRounded,
-                'lon_rounded' => $lonRounded,
-                'forecast_time' => Carbon::createFromTimestamp($hourly['dt']),
-                'temperature' => $hourly['temp'],
-                'weather' => $hourly['weather'][0]['description'] ?? '不明',
-                'icon' => $hourly['weather'][0]['icon'] ?? null,
-                'pop' => $hourly['pop'] ?? 0, // 降水確率
-                'date' => Carbon::today(),
-                'locale' => $locale,
-            ]);
+            $forecastTime = Carbon::createFromTimestamp($hourly['dt']);
+            
+            // 重複チェック：同じ座標・言語・予報時刻のデータが存在しないことを確認
+            $exists = WeatherHourlyForecast::where('lat_rounded', $latRounded)
+                ->where('lon_rounded', $lonRounded)
+                ->where('locale', $locale)
+                ->where('forecast_time', $forecastTime)
+                ->exists();
+            
+            if (!$exists) {
+                WeatherHourlyForecast::create([
+                    'region_id' => null,
+                    'lat_rounded' => $latRounded,
+                    'lon_rounded' => $lonRounded,
+                    'forecast_time' => $forecastTime,
+                    'temperature' => $hourly['temp'],
+                    'weather' => $hourly['weather'][0]['description'] ?? '不明',
+                    'icon' => $hourly['weather'][0]['icon'] ?? null,
+                    'pop' => $hourly['pop'] ?? 0, // 降水確率
+                    'date' => Carbon::today(),
+                    'locale' => $locale,
+                ]);
+            }
         }
     }
 }

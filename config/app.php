@@ -179,9 +179,9 @@ return [
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
+        // App\Providers\AuthServiceProvider::class,        // 削除済み
+        // App\Providers\BroadcastServiceProvider::class,   // 削除済み
+        // App\Providers\EventServiceProvider::class,       // 削除済み
         App\Providers\RouteServiceProvider::class,
     ])->toArray(),
 

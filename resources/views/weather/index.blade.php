@@ -262,6 +262,137 @@
     </div>
     @endif
     @endisset
+
+    {{-- 天気連動グルメ推奨セクション --}}
+    @isset($weatherData['restaurant_recommendations'])
+    <div class="mt-6 border-t pt-6">
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 border border-yellow-200">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                🍽️ {{ __('app.weather_based_restaurants') }}
+            </h3>
+            
+            @if($weatherData['restaurant_recommendations']['has_recommendations'])
+                {{-- 天気に基づく推奨理由 --}}
+                <div class="bg-white rounded-lg p-4 mb-4 border-l-4 border-yellow-400">
+                    <p class="text-gray-700 text-sm">
+                        {{ $weatherData['restaurant_recommendations']['weather_based_reason'] }}
+                    </p>
+                </div>
+                
+                {{-- レストラン一覧 --}}
+                <div class="grid gap-3">
+                    @foreach($weatherData['restaurant_recommendations']['restaurants'] as $restaurant)
+                    @if(!empty($restaurant['urls']['pc']))
+                        {{-- クリック可能なレストランカード --}}
+                        <a href="{{ $restaurant['urls']['pc'] }}" target="_blank" class="block bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md hover:border-orange-300 transition-all transform hover:scale-[1.02] cursor-pointer">
+                            <div class="flex items-start space-x-3">
+                                {{-- 店舗画像 --}}
+                                @if(!empty($restaurant['photo']['pc']))
+                                    <div class="flex-shrink-0">
+                                        <img src="{{ $restaurant['photo']['pc'] }}" 
+                                             alt="{{ $restaurant['name'] }}" 
+                                             class="w-16 h-16 rounded-lg object-cover">
+                                    </div>
+                                @endif
+                                
+                                {{-- 店舗情報 --}}
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-800 mb-2">{{ $restaurant['name'] }}</h4>
+                                    <p class="text-sm text-gray-600 mb-1">🏷️ {{ $restaurant['genre'] }}</p>
+                                    
+                                    @if($restaurant['address'])
+                                        <p class="text-xs text-gray-500 mb-1">🏠 {{ Str::limit($restaurant['address'], 40) }}</p>
+                                    @endif
+                                    
+                                    @if($restaurant['station_name'])
+                                        <p class="text-xs text-gray-500 mb-1">🚉 {{ $restaurant['station_name'] }}駅</p>
+                                    @endif
+                                    
+                                    @if($restaurant['open'])
+                                        <p class="text-xs text-gray-500 mb-1">🕒 {{ Str::limit($restaurant['open'], 30) }}</p>
+                                    @endif
+                                    
+                                    @if($restaurant['budget'])
+                                        <p class="text-sm text-gray-600 mb-1">💰 {{ $restaurant['budget'] }}</p>
+                                    @endif
+                                    
+                                    @if($restaurant['access'])
+                                        <p class="text-xs text-gray-500 mb-1">🚃 {{ Str::limit($restaurant['access'], 40) }}</p>
+                                    @endif
+                                    
+                                </div>
+                                
+                                {{-- 詳細ボタン --}}
+                                <div class="flex-shrink-0">
+                                    <div class="bg-orange-500 text-white text-xs px-3 py-2 rounded-lg">
+                                        {{ __('app.view_details') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    @else
+                        {{-- URLが無い場合はクリック不可 --}}
+                        <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                            <div class="flex items-start space-x-3">
+                                {{-- 店舗画像 --}}
+                                @if(!empty($restaurant['photo']['pc']))
+                                    <div class="flex-shrink-0">
+                                        <img src="{{ $restaurant['photo']['pc'] }}" 
+                                             alt="{{ $restaurant['name'] }}" 
+                                             class="w-16 h-16 rounded-lg object-cover">
+                                    </div>
+                                @endif
+                                
+                                {{-- 店舗情報 --}}
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-800 mb-2">{{ $restaurant['name'] }}</h4>
+                                    <p class="text-sm text-gray-600 mb-1">🏷️ {{ $restaurant['genre'] }}</p>
+                                    
+                                    @if($restaurant['address'])
+                                        <p class="text-xs text-gray-500 mb-1">🏠 {{ Str::limit($restaurant['address'], 40) }}</p>
+                                    @endif
+                                    
+                                    @if($restaurant['station_name'])
+                                        <p class="text-xs text-gray-500 mb-1">🚉 {{ $restaurant['station_name'] }}駅</p>
+                                    @endif
+                                    
+                                    @if($restaurant['open'])
+                                        <p class="text-xs text-gray-500 mb-1">🕒 {{ Str::limit($restaurant['open'], 30) }}</p>
+                                    @endif
+                                    
+                                    @if($restaurant['budget'])
+                                        <p class="text-sm text-gray-600 mb-1">💰 {{ $restaurant['budget'] }}</p>
+                                    @endif
+                                    
+                                    @if($restaurant['access'])
+                                        <p class="text-xs text-gray-500 mb-1">🚃 {{ Str::limit($restaurant['access'], 40) }}</p>
+                                    @endif
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    @endforeach
+                </div>
+            @else
+                {{-- グルメ情報が取得できない場合 --}}
+                <div class="text-center py-4">
+                    <p class="text-gray-600">{{ $weatherData['restaurant_recommendations']['weather_based_reason'] }}</p>
+                </div>
+            @endif
+            
+            {{-- HotPepper クレジット表示（ガイドライン準拠） --}}
+            <div class="mt-4 pt-4 border-t border-yellow-300">
+                <div class="flex items-center justify-center text-xs text-gray-500">
+                    <span class="mr-2">{{ $weatherData['restaurant_recommendations']['credit']['text'] }}</span>
+                    <a href="{{ $weatherData['restaurant_recommendations']['credit']['link_url'] }}" target="_blank">
+                        <img src="{{ $weatherData['restaurant_recommendations']['credit']['logo_url'] }}" alt="ホットペッパーグルメ" class="h-4">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endisset
 </div>
 
 @isset($weatherData)

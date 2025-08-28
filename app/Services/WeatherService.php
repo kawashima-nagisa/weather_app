@@ -2,14 +2,16 @@
 
 namespace App\Services;
 
+use App\Services\TourismRecommendationService;
 use Carbon\Carbon;
 
-// メインビジネスロジック - キャッシュ判定とAPI/DB協調処理
+// メインビジネスロジック - キャッシュ判定とAPI/DB協調処理 + グルメ推奨統合
 class WeatherService
 {
     public function __construct(
         private WeatherApiService $apiService, // API通信担当
-        private WeatherDbService $dbService   // DB操作担当
+        private WeatherDbService $dbService,   // DB操作担当
+        private TourismRecommendationService $tourismService // グルメ推奨担当
     ) {}
 
     // 地域一覧取得
@@ -18,7 +20,7 @@ class WeatherService
         return $this->dbService->getAllRegions();
     }
 
-    // 地域天気取得（キャッシュ優先 → API取得 → DB保存）
+    // 地域天気取得（キャッシュ優先 → API取得 → DB保存 + グルメ推奨）
     public function getRegionWeather(int $regionId): ?array
     {
         $locale = app()->getLocale();
@@ -29,37 +31,48 @@ class WeatherService
         if ($cachedWeather) {
             // キャッシュヒット：DBから取得
             $region = $this->dbService->getRegionById($regionId);
-            return [
+            $result = [
                 'weather' => $cachedWeather,
                 'region' => $region,
                 'is_from_cache' => true,
                 'retrieved_at' => $cachedWeather->created_at,
             ];
+        } else {
+            // キャッシュミス：APIから新規取得
+            $region = $this->dbService->getRegionById($regionId);
+            if (!$region) {
+                return null;
+            }
+
+            $weatherData = $this->apiService->fetchWeatherByCoordinates($region->lat, $region->lon);
+            if (!$weatherData) {
+                return null;
+            }
+
+            // DB保存してキャッシュ作成
+            $newWeatherRecord = $this->dbService->saveRegionWeather($weatherData, $regionId, $locale);
+
+            $result = [
+                'weather' => $newWeatherRecord,
+                'region' => $region,
+                'is_from_cache' => false,
+                'retrieved_at' => Carbon::now(),
+            ];
         }
 
-        // キャッシュミス：APIから新規取得
-        $region = $this->dbService->getRegionById($regionId);
-        if (!$region) {
-            return null;
-        }
+        // グルメ推奨を追加（天気情報取得のついで）
+        $result['restaurant_recommendations'] = $this->tourismService->getRestaurantRecommendationsByRegion(
+            $result['weather']->weather,
+            $result['region']->lat,   // 緯度を追加
+            $result['region']->lon,   // 経度を追加
+            $result['region']->name,
+            $locale
+        );
 
-        $weatherData = $this->apiService->fetchWeatherByCoordinates($region->lat, $region->lon);
-        if (!$weatherData) {
-            return null;
-        }
-
-        // DB保存してキャッシュ作成
-        $newWeatherRecord = $this->dbService->saveRegionWeather($weatherData, $regionId, $locale);
-
-        return [
-            'weather' => $newWeatherRecord,
-            'region' => $region,
-            'is_from_cache' => false,
-            'retrieved_at' => Carbon::now(),
-        ];
+        return $result;
     }
 
-    // 現在地天気取得（座標範囲キャッシュ優先 → API取得 → DB保存）
+    // 現在地天気取得（座標範囲キャッシュ優先 → API取得 → DB保存 + グルメ推奨）
     public function getLocationWeather(float $lat, float $lon): ?array
     {
         $locale = app()->getLocale();
@@ -69,27 +82,40 @@ class WeatherService
         
         if ($cachedWeather) {
             // キャッシュヒット：DBから取得
-            return [
+            $result = [
                 'location_weather' => $cachedWeather,
                 'is_from_cache' => true,
                 'retrieved_at' => $cachedWeather->created_at,
             ];
+        } else {
+            // キャッシュミス：APIから新規取得
+            $weatherData = $this->apiService->fetchWeatherByCoordinates($lat, $lon);
+            if (!$weatherData) {
+                return null;
+            }
+
+            // DB保存してキャッシュ作成
+            $newLocationRecord = $this->dbService->saveLocationWeather($weatherData, $lat, $lon, $locale);
+
+            $result = [
+                'location_weather' => $newLocationRecord,
+                'is_from_cache' => false,
+                'retrieved_at' => Carbon::now(),
+            ];
         }
 
-        // キャッシュミス：APIから新規取得
-        $weatherData = $this->apiService->fetchWeatherByCoordinates($lat, $lon);
-        if (!$weatherData) {
-            return null;
-        }
+        // グルメ推奨を追加（現在地天気取得のついで）
+        $weatherInfo = $result['location_weather']->weather_data;
+        $currentWeather = $weatherInfo['weather'][0]['description'] ?? '';
+        
+        $result['restaurant_recommendations'] = $this->tourismService->getRestaurantRecommendationsByLocation(
+            $currentWeather,
+            $lat,
+            $lon,
+            $locale
+        );
 
-        // DB保存してキャッシュ作成
-        $newLocationRecord = $this->dbService->saveLocationWeather($weatherData, $lat, $lon, $locale);
-
-        return [
-            'location_weather' => $newLocationRecord,
-            'is_from_cache' => false,
-            'retrieved_at' => Carbon::now(),
-        ];
+        return $result;
     }
 
     // 地域の時間別予報取得（キャッシュ優先 → API取得 → DB保存）

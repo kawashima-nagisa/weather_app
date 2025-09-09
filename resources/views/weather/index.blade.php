@@ -393,6 +393,197 @@
         </div>
     </div>
     @endisset
+
+    {{-- 天気連動トイレ推奨セクション（現在地のみ） --}}
+    @isset($weatherData['toilet_recommendations'])
+    @if($isLocationWeather)
+    <div class="mt-6 border-t pt-6">
+        <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                🚽 {{ __('app.weather_based_toilets') }}
+            </h3>
+            
+            @if(!empty($weatherData['toilet_recommendations']['prioritized']))
+                {{-- 天気に基づく推奨理由 --}}
+                <div class="bg-white rounded-lg p-4 mb-4 border-l-4 border-purple-400">
+                    <p class="text-gray-700 text-sm">
+                        {{ $weatherData['toilet_recommendations']['recommendation_reason'] }}
+                    </p>
+                    @if(isset($weatherData['toilet_recommendations']['search_radius']))
+                        <p class="text-gray-600 text-xs mt-1">
+                            {{ __('app.search_radius') }}: {{ $weatherData['toilet_recommendations']['search_radius'] }}m
+                        </p>
+                    @endif
+                </div>
+                
+                {{-- タブ切り替え式トイレ施設一覧 --}}
+                <div class="toilet-tabs">
+                    {{-- タブヘッダー --}}
+                    <div class="flex flex-wrap border-b border-purple-200 mb-4">
+                        @foreach($weatherData['toilet_recommendations']['by_type'] as $type => $facilities)
+                            @if(!empty($facilities))
+                                <button onclick="switchToiletTab('{{ $type }}')" 
+                                        class="tab-button px-4 py-2 text-sm font-medium transition-colors duration-200 border-b-2 mr-2 mb-2"
+                                        id="tab-{{ $type }}"
+                                        data-tab="{{ $type }}">
+                                    @if($type === 'convenience_store')
+                                        🏪 {{ __('app.convenience_stores') }} ({{ count($facilities) }})
+                                    @elseif($type === 'public_toilet')
+                                        🚽 {{ __('app.public_toilets') }} ({{ count($facilities) }})
+                                    @elseif($type === 'supermarket')
+                                        🛒 {{ __('app.supermarkets') }} ({{ count($facilities) }})
+                                    @elseif($type === 'restaurant')
+                                        🍴 {{ __('app.restaurants') }} ({{ count($facilities) }})
+                                    @elseif($type === 'gas_station')
+                                        ⛽ {{ __('app.gas_stations') }} ({{ count($facilities) }})
+                                    @endif
+                                </button>
+                            @endif
+                        @endforeach
+                    </div>
+
+                    {{-- タブコンテンツ --}}
+                    @foreach($weatherData['toilet_recommendations']['by_type'] as $type => $facilities)
+                        @if(!empty($facilities))
+                            <div id="content-{{ $type }}" class="tab-content hidden">
+                                <div class="grid gap-3">
+                                    @foreach($facilities as $facility)
+                                    <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                                        <div class="flex items-start space-x-3">
+                                            {{-- 施設タイプアイコン --}}
+                                            <div class="flex-shrink-0">
+                                                <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                                                    @if($facility['type'] === 'convenience_store')
+                                                        <span class="text-lg">🏪</span>
+                                                    @elseif($facility['type'] === 'public_toilet')
+                                                        <span class="text-lg">🚽</span>
+                                                    @elseif($facility['type'] === 'supermarket')
+                                                        <span class="text-lg">🛒</span>
+                                                    @elseif($facility['type'] === 'restaurant')
+                                                        <span class="text-lg">🍴</span>
+                                                    @elseif($facility['type'] === 'gas_station')
+                                                        <span class="text-lg">⛽</span>
+                                                    @else
+                                                        <span class="text-lg">📍</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            {{-- 施設情報 --}}
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="font-semibold text-gray-800 mb-2">{{ $facility['name'] }}</h4>
+                                                
+                                                @if($facility['vicinity'])
+                                                    <p class="text-xs text-gray-500 mb-1">🏠 {{ $facility['vicinity'] }}</p>
+                                                @endif
+                                                
+                                                @if(isset($facility['distance_display']))
+                                                    <p class="text-xs text-gray-500 mb-1">📍 {{ __('app.distance') }}: {{ $facility['distance_display'] }}</p>
+                                                @endif
+                                                
+                                                {{-- 評価情報 --}}
+                                                @if(isset($facility['rating']) && $facility['rating'])
+                                                    <div class="flex items-center mb-1">
+                                                        <span class="text-yellow-400 text-sm">⭐</span>
+                                                        <span class="text-xs text-gray-600 ml-1">
+                                                            {{ $facility['rating'] }}
+                                                            @if(isset($facility['user_ratings_total']) && $facility['user_ratings_total'] > 0)
+                                                                ({{ $facility['user_ratings_total'] }}{{ __('app.reviews') }})
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                @endif
+                                                
+                                                {{-- 営業状況 --}}
+                                                @if(isset($facility['opening_hours']['open_now']))
+                                                    <div class="text-xs">
+                                                        @if($facility['opening_hours']['open_now'])
+                                                            <span class="text-green-600">✅ {{ __('app.open_now') }}</span>
+                                                        @else
+                                                            <span class="text-red-600">❌ {{ __('app.closed_now') }}</span>
+                                                        @endif
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            
+                                            {{-- Google Maps リンク --}}
+                                            @if(isset($facility['geometry']['lat']) && isset($facility['geometry']['lng']))
+                                                <div class="flex-shrink-0">
+                                                    <a href="https://www.google.com/maps/search/?api=1&query={{ $facility['geometry']['lat'] }},{{ $facility['geometry']['lng'] }}" 
+                                                       target="_blank" 
+                                                       class="bg-purple-500 text-white text-xs px-3 py-2 rounded-lg hover:bg-purple-600 transition-colors">
+                                                        {{ __('app.view_map') }}
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+
+                {{-- JavaScript for tab switching --}}
+                <script>
+                // Initialize tabs
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Find first tab and activate it
+                    const firstTab = document.querySelector('.tab-button');
+                    if (firstTab) {
+                        const firstType = firstTab.getAttribute('data-tab');
+                        switchToiletTab(firstType);
+                    }
+                });
+
+                function switchToiletTab(activeType) {
+                    // Hide all tab contents
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Reset all tab buttons
+                    document.querySelectorAll('.tab-button').forEach(button => {
+                        button.classList.remove('border-purple-500', 'text-purple-600', 'bg-purple-50');
+                        button.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    });
+                    
+                    // Show active tab content
+                    const activeContent = document.getElementById('content-' + activeType);
+                    if (activeContent) {
+                        activeContent.classList.remove('hidden');
+                    }
+                    
+                    // Style active tab button
+                    const activeButton = document.getElementById('tab-' + activeType);
+                    if (activeButton) {
+                        activeButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                        activeButton.classList.add('border-purple-500', 'text-purple-600', 'bg-purple-50');
+                    }
+                }
+                </script>
+                
+            @else
+                {{-- トイレ情報が取得できない場合 --}}
+                <div class="text-center py-4">
+                    <p class="text-gray-600">{{ __('app.no_toilet_found') }}</p>
+                    @if(isset($weatherData['toilet_recommendations']['is_fallback']) && $weatherData['toilet_recommendations']['is_fallback'])
+                        <p class="text-xs text-gray-500 mt-1">{{ __('app.fallback_search_performed') }}</p>
+                    @endif
+                </div>
+            @endif
+            
+            {{-- Google Places API クレジット表示 --}}
+            <div class="mt-4 pt-4 border-t border-purple-300">
+                <div class="flex items-center justify-center text-xs text-gray-500">
+                    <span>{{ __('app.powered_by_google_places') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    @endisset
 </div>
 
 @isset($weatherData)

@@ -59,4 +59,21 @@ return [
     'gourmet_recommendations' => 'おすすめグルメ',
     'no_restaurants_found' => 'おすすめレストランが見つかりませんでした',
     'restaurant_info_unavailable' => 'レストラン情報を取得できませんでした',
+    
+    // トイレ推奨機能
+    'weather_based_toilets' => '天気に合わせたトイレ情報',
+    'search_radius' => '検索範囲',
+    'distance' => '距離',
+    'reviews' => '件の評価',
+    'open_now' => '営業中',
+    'closed_now' => '営業時間外',
+    'view_map' => '地図で見る',
+    'convenience_stores' => 'コンビニ',
+    'public_toilets' => '公共トイレ',
+    'supermarkets' => 'スーパー',
+    'restaurants' => 'レストラン',
+    'gas_stations' => 'ガソリンスタンド',
+    'no_toilet_found' => 'トイレ情報が見つかりませんでした',
+    'fallback_search_performed' => '拡大検索を実行しました',
+    'powered_by_google_places' => 'Powered by Google Places API',
 ];

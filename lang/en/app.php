@@ -59,4 +59,21 @@ return [
     'gourmet_recommendations' => 'Restaurant Recommendations',
     'no_restaurants_found' => 'No recommended restaurants found',
     'restaurant_info_unavailable' => 'Restaurant information is not available',
+    
+    // Toilet recommendation feature
+    'weather_based_toilets' => 'Weather-Based Toilet Information',
+    'search_radius' => 'Search Radius',
+    'distance' => 'Distance',
+    'reviews' => ' reviews',
+    'open_now' => 'Open Now',
+    'closed_now' => 'Closed',
+    'view_map' => 'View Map',
+    'convenience_stores' => 'Convenience Stores',
+    'public_toilets' => 'Public Toilets',
+    'supermarkets' => 'Supermarkets',
+    'restaurants' => 'Restaurants',
+    'gas_stations' => 'Gas Stations',
+    'no_toilet_found' => 'No toilet information found',
+    'fallback_search_performed' => 'Extended search performed',
+    'powered_by_google_places' => 'Powered by Google Places API',
 ];

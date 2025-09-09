@@ -59,4 +59,21 @@ return [
     'gourmet_recommendations' => '美食推荐',
     'no_restaurants_found' => '未找到推荐餐厅',
     'restaurant_info_unavailable' => '无法获取餐厅信息',
+    
+    // 厕所推荐功能
+    'weather_based_toilets' => '天气推荐厕所信息',
+    'search_radius' => '搜索半径',
+    'distance' => '距离',
+    'reviews' => '条评价',
+    'open_now' => '营业中',
+    'closed_now' => '已关闭',
+    'view_map' => '查看地图',
+    'convenience_stores' => '便利店',
+    'public_toilets' => '公共厕所',
+    'supermarkets' => '超市',
+    'restaurants' => '餐厅',
+    'gas_stations' => '加油站',
+    'no_toilet_found' => '未找到厕所信息',
+    'fallback_search_performed' => '执行了扩大搜索',
+    'powered_by_google_places' => 'Powered by Google Places API',
 ];

@@ -3,15 +3,17 @@
 namespace App\Services;
 
 use App\Services\TourismRecommendationService;
+use App\Services\ToiletRecommendationService;
 use Carbon\Carbon;
 
-// メインビジネスロジック - キャッシュ判定とAPI/DB協調処理 + グルメ推奨統合
+// メインビジネスロジック - キャッシュ判定とAPI/DB協調処理 + グルメ・トイレ推奨統合
 class WeatherService
 {
     public function __construct(
         private WeatherApiService $apiService, // API通信担当
         private WeatherDbService $dbService,   // DB操作担当
-        private TourismRecommendationService $tourismService // グルメ推奨担当
+        private TourismRecommendationService $tourismService, // グルメ推奨担当
+        private ToiletRecommendationService $toiletService   // トイレ推奨担当
     ) {}
 
     // 地域一覧取得
@@ -69,6 +71,8 @@ class WeatherService
             $locale
         );
 
+        // 注意：地域選択時はトイレ推奨機能は提供しない（現在地のみ）
+
         return $result;
     }
 
@@ -114,6 +118,39 @@ class WeatherService
             $lon,
             $locale
         );
+
+        // トイレ推奨を追加（現在地の天気連動）
+        $weatherCondition = $weatherInfo['weather'][0]['main'] ?? 'Clear';
+        $result['toilet_recommendations'] = $this->toiletService->getRecommendedToiletsByWeather(
+            $lat,
+            $lon,
+            $weatherCondition,
+            $locale
+        );
+
+        // 距離計算を追加（現在地基準）
+        if (!empty($result['toilet_recommendations']['prioritized'])) {
+            $result['toilet_recommendations']['prioritized'] = $this->toiletService->addDistanceToFacilities(
+                $result['toilet_recommendations']['prioritized'],
+                $lat,
+                $lon
+            );
+        }
+        
+        // タブ表示用のby_type配列にも距離計算とソートを適用
+        if (!empty($result['toilet_recommendations']['by_type'])) {
+            foreach ($result['toilet_recommendations']['by_type'] as $type => $facilities) {
+                // 距離計算を追加
+                $facilitiesWithDistance = $this->toiletService->addDistanceToFacilities($facilities, $lat, $lon);
+                
+                // 距離順にソート（近い順）
+                usort($facilitiesWithDistance, function ($a, $b) {
+                    return ($a['distance_meters'] ?? PHP_FLOAT_MAX) <=> ($b['distance_meters'] ?? PHP_FLOAT_MAX);
+                });
+                
+                $result['toilet_recommendations']['by_type'][$type] = $facilitiesWithDistance;
+            }
+        }
 
         return $result;
     }
@@ -173,5 +210,37 @@ class WeatherService
 
         // 保存後の今後24時間分を再取得
         return $this->dbService->findLocationHourlyCache($lat, $lon, $locale);
+    }
+
+    /**
+     * 天気レコードから天気状況を抽出
+     * 
+     * @param mixed $weatherRecord 天気レコード
+     * @return string OpenWeatherMap天気コード（Clear, Rain, Snow等）
+     */
+    private function extractWeatherCondition($weatherRecord): string
+    {
+        // WeatherRecordモデルの場合
+        if (is_object($weatherRecord) && isset($weatherRecord->weather_data)) {
+            return $weatherRecord->weather_data['weather'][0]['main'] ?? 'Clear';
+        }
+        
+        // weatherカラムの場合（地域天気）
+        if (is_object($weatherRecord) && isset($weatherRecord->weather)) {
+            // weatherカラムから天気状況を推測
+            $weather = strtolower($weatherRecord->weather);
+            if (str_contains($weather, '雨') || str_contains($weather, 'rain')) {
+                return 'Rain';
+            } elseif (str_contains($weather, '雪') || str_contains($weather, 'snow')) {
+                return 'Snow';
+            } elseif (str_contains($weather, '雷') || str_contains($weather, 'thunder')) {
+                return 'Thunderstorm';
+            } elseif (str_contains($weather, '曇') || str_contains($weather, 'cloud')) {
+                return 'Clouds';
+            }
+        }
+        
+        // デフォルトは晴れ
+        return 'Clear';
     }
 }

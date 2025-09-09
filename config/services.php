@@ -41,4 +41,9 @@ return [
         'base_url' => env('HOTPEPPER_BASE_URL', 'http://webservice.recruit.co.jp/hotpepper'),
     ],
 
+    'google_places' => [
+        'api_key' => env('GOOGLE_PLACES_API_KEY'),
+        'base_url' => env('GOOGLE_PLACES_BASE_URL', 'https://maps.googleapis.com'),
+    ],
+
 ];

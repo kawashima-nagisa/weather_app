@@ -449,9 +449,9 @@
                                 <div class="grid gap-3">
                                     @foreach($facilities as $facility)
                                     <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                                        <div class="flex items-start space-x-3">
+                                        <div class="flex flex-col sm:flex-row items-start sm:space-x-3 space-y-3 sm:space-y-0">
                                             {{-- 施設タイプアイコン --}}
-                                            <div class="flex-shrink-0">
+                                            <div class="flex-shrink-0 w-full sm:w-auto flex justify-center sm:justify-start">
                                                 <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
                                                     @if($facility['type'] === 'convenience_store')
                                                         <span class="text-lg">🏪</span>
@@ -471,7 +471,7 @@
                                             
                                             {{-- 施設情報 --}}
                                             <div class="flex-1 min-w-0">
-                                                <h4 class="font-semibold text-gray-800 mb-2">{{ $facility['name'] }}</h4>
+                                                <h4 class="font-semibold text-gray-800 mb-2 text-center sm:text-left">{{ $facility['name'] }}</h4>
                                                 
                                                 @if($facility['vicinity'])
                                                     <p class="text-xs text-gray-500 mb-1">🏠 {{ $facility['vicinity'] }}</p>
@@ -483,7 +483,7 @@
                                                 
                                                 {{-- 評価情報 --}}
                                                 @if(isset($facility['rating']) && $facility['rating'])
-                                                    <div class="flex items-center mb-1">
+                                                    <div class="flex items-center justify-center sm:justify-start mb-1">
                                                         <span class="text-yellow-400 text-sm">⭐</span>
                                                         <span class="text-xs text-gray-600 ml-1">
                                                             {{ $facility['rating'] }}
@@ -496,7 +496,7 @@
                                                 
                                                 {{-- 営業状況 --}}
                                                 @if(isset($facility['opening_hours']['open_now']))
-                                                    <div class="text-xs">
+                                                    <div class="text-xs text-center sm:text-left">
                                                         @if($facility['opening_hours']['open_now'])
                                                             <span class="text-green-600">✅ {{ __('app.open_now') }}</span>
                                                         @else
@@ -508,7 +508,7 @@
                                             
                                             {{-- Google Maps リンク --}}
                                             @if(isset($facility['geometry']['lat']) && isset($facility['geometry']['lng']))
-                                                <div class="flex-shrink-0">
+                                                <div class="flex-shrink-0 w-full sm:w-auto flex justify-center sm:justify-end">
                                                     <a href="https://www.google.com/maps/search/?api=1&query={{ $facility['geometry']['lat'] }},{{ $facility['geometry']['lng'] }}" 
                                                        target="_blank" 
                                                        class="bg-purple-500 text-white text-xs px-3 py-2 rounded-lg hover:bg-purple-600 transition-colors">

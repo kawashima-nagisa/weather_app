@@ -285,19 +285,19 @@
                     @if(!empty($restaurant['urls']['pc']))
                         {{-- クリック可能なレストランカード --}}
                         <a href="{{ $restaurant['urls']['pc'] }}" target="_blank" class="block bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md hover:border-orange-300 transition-all transform hover:scale-[1.02] cursor-pointer">
-                            <div class="flex items-start space-x-3">
+                            <div class="flex flex-col sm:flex-row items-start sm:space-x-3 space-y-3 sm:space-y-0">
                                 {{-- 店舗画像 --}}
                                 @if(!empty($restaurant['photo']['pc']))
-                                    <div class="flex-shrink-0">
+                                    <div class="flex-shrink-0 w-full sm:w-auto flex justify-center sm:justify-start">
                                         <img src="{{ $restaurant['photo']['pc'] }}" 
                                              alt="{{ $restaurant['name'] }}" 
-                                             class="w-16 h-16 rounded-lg object-cover">
+                                             class="w-20 h-20 sm:w-16 sm:h-16 rounded-lg object-cover">
                                     </div>
                                 @endif
                                 
                                 {{-- 店舗情報 --}}
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-800 mb-2">{{ $restaurant['name'] }}</h4>
+                                    <h4 class="font-semibold text-gray-800 mb-2 text-center sm:text-left">{{ $restaurant['name'] }}</h4>
                                     <p class="text-sm text-gray-600 mb-1">🏷️ {{ $restaurant['genre'] }}</p>
                                     
                                     @if($restaurant['address'])
@@ -323,7 +323,7 @@
                                 </div>
                                 
                                 {{-- 詳細ボタン --}}
-                                <div class="flex-shrink-0">
+                                <div class="flex-shrink-0 w-full sm:w-auto flex justify-center sm:justify-end">
                                     <div class="bg-orange-500 text-white text-xs px-3 py-2 rounded-lg">
                                         {{ __('app.view_details') }}
                                     </div>
@@ -333,19 +333,19 @@
                     @else
                         {{-- URLが無い場合はクリック不可 --}}
                         <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                            <div class="flex items-start space-x-3">
+                            <div class="flex flex-col sm:flex-row items-start sm:space-x-3 space-y-3 sm:space-y-0">
                                 {{-- 店舗画像 --}}
                                 @if(!empty($restaurant['photo']['pc']))
-                                    <div class="flex-shrink-0">
+                                    <div class="flex-shrink-0 w-full sm:w-auto flex justify-center sm:justify-start">
                                         <img src="{{ $restaurant['photo']['pc'] }}" 
                                              alt="{{ $restaurant['name'] }}" 
-                                             class="w-16 h-16 rounded-lg object-cover">
+                                             class="w-20 h-20 sm:w-16 sm:h-16 rounded-lg object-cover">
                                     </div>
                                 @endif
                                 
                                 {{-- 店舗情報 --}}
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-800 mb-2">{{ $restaurant['name'] }}</h4>
+                                    <h4 class="font-semibold text-gray-800 mb-2 text-center sm:text-left">{{ $restaurant['name'] }}</h4>
                                     <p class="text-sm text-gray-600 mb-1">🏷️ {{ $restaurant['genre'] }}</p>
                                     
                                     @if($restaurant['address'])

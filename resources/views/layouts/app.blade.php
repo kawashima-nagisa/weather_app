@@ -14,14 +14,14 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('title', __('app.app_name'))">
     <meta property="og:description" content="@yield('description', __('app.meta_description'))">
-    <meta property="og:image" content="{{ asset('images/weather-app-og.jpg') }}">
+    <meta property="og:image" content="{{ asset('images/weather.png') }}">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
     <meta property="twitter:title" content="@yield('title', __('app.app_name'))">
     <meta property="twitter:description" content="@yield('description', __('app.meta_description'))">
-    <meta property="twitter:image" content="{{ asset('images/weather-app-og.jpg') }}">
+    <meta property="twitter:image" content="{{ asset('images/weather.png') }}">
     
     <!-- JSON-LD structured data -->
     <script type="application/ld+json">

@@ -45,7 +45,11 @@ class RegionSeeder extends Seeder
         ];
 
         foreach ($regions as $region) {
-            Region::create($region);
+           
+            Region::updateOrCreate(
+                ['name' => $region['name']], // 検索条件
+                $region // 作成/更新データ
+            );
         }
     }
 }

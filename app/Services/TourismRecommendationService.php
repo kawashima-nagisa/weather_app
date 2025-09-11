@@ -154,8 +154,9 @@ class TourismRecommendationService
                 if (stripos($weather, $keyword) !== false) {
                     return [
                         'weather_type' => $weatherType,
-                        'primary' => $genreInfo['primary'],
-                        'secondary' => $genreInfo['secondary'],
+                        'options' => $genreInfo['options'],
+                        'primary' => $genreInfo['options'][0],    // 後方互換のため
+                        'secondary' => $genreInfo['options'][1] ?? $genreInfo['options'][0],  // 後方互換のため
                         'reason' => $genreInfo['reason']
                     ];
                 }
@@ -165,8 +166,9 @@ class TourismRecommendationService
         // マッチしない場合はデフォルトを返す
         return [
             'weather_type' => 'default',
-            'primary' => $mapping['default']['primary'],
-            'secondary' => $mapping['default']['secondary'], 
+            'options' => $mapping['default']['options'],
+            'primary' => $mapping['default']['options'][0],
+            'secondary' => $mapping['default']['options'][1] ?? $mapping['default']['options'][0],
             'reason' => $mapping['default']['reason']
         ];
     }
